@@ -9,3 +9,4 @@ Thumbs.db
 
 api/local.settings.json
 web/dist
+.vscode/
