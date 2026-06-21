@@ -40,14 +40,6 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           action: "close"
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
-
-jobs:
-  build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     permissions:
@@ -91,4 +83,3 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           action: "close"
->>>>>>> adc098a082af076a737755f6a36aa75a75af0b57
