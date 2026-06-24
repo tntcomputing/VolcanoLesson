@@ -7,7 +7,7 @@ type LogEntry = {
   timestamp: string;
 };
 
-type Outpost = {
+type Station = {
   id: string;
   locationId: string;
   name: string;
@@ -19,12 +19,12 @@ type LogResponse = {
   count: number;
 };
 
-const outposts: Outpost[] = [
-  { id: "north-ridge", locationId: "North Ridge", name: "North Ridge", position: { left: "20%", top: "20%" } },
-  { id: "east-crater", locationId: "East Crater", name: "East Crater", position: { left: "77%", top: "30%" } },
-  { id: "south-camp", locationId: "South Camp", name: "South Camp", position: { left: "54%", top: "79%" } },
-  { id: "west-peak", locationId: "West Peak", name: "West Peak", position: { left: "10%", top: "62%" } },
-  { id: "sky-radar", locationId: "Sky Radar", name: "Sky Radar", position: { left: "50%", top: "12%" } }
+const stations: Station[] = [
+  { id: "A", locationId: "A", name: "North Ridge", position: { left: "20%", top: "20%" } },
+  { id: "B", locationId: "B", name: "East Crater", position: { left: "77%", top: "30%" } },
+  { id: "C", locationId: "C", name: "South Camp", position: { left: "54%", top: "79%" } },
+  { id: "D", locationId: "D", name: "West Peak", position: { left: "10%", top: "62%" } },
+  { id: "E", locationId: "E", name: "Sky Radar", position: { left: "50%", top: "12%" } }
 ];
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ?? "/api";
@@ -79,7 +79,7 @@ root.innerHTML = `
     <section class="map-card">
       <div class="map-header">
         <p>Volcano perimeter monitor</p>
-        <span id="reporting-summary">0 of ${outposts.length} outposts reporting</span>
+        <span id="reporting-summary">0 of ${stations.length} outposts reporting</span>
       </div>
       <div class="scene" aria-label="Volcano map with outpost markers">
         <svg viewBox="0 0 960 620" class="volcano-illustration" role="img" aria-hidden="true">
@@ -141,19 +141,19 @@ const scene = root.querySelector(".scene") as HTMLDivElement;
 function renderMarkers(activeLocations: Map<string, LogEntry>): void {
   scene.querySelectorAll(".outpost-marker").forEach((marker) => marker.remove());
 
-  for (const outpost of outposts) {
-    const logEntry = activeLocations.get(outpost.locationId.toLowerCase());
+  for (const station of stations) {
+    const logEntry = activeLocations.get(station.locationId.toLowerCase());
     const active = Boolean(logEntry);
     const marker = document.createElement("div");
     marker.className = `outpost-marker ${active ? "outpost-marker--active" : "outpost-marker--offline"}`;
-    marker.style.left = outpost.position.left;
-    marker.style.top = outpost.position.top;
-    marker.setAttribute("aria-label", `${outpost.name} ${active ? "online" : "offline"}`);
+    marker.style.left = station.position.left;
+    marker.style.top = station.position.top;
+    marker.setAttribute("aria-label", `${station.name} ${active ? "online" : "offline"}`);
     marker.innerHTML = `
       <span class="outpost-marker__pulse"></span>
       <span class="outpost-marker__ring"></span>
       <span class="outpost-marker__dot"></span>
-      <span class="outpost-marker__label">${outpost.name}</span>
+      <span class="outpost-marker__label">${station.name}</span>
       ${logEntry ? `<span class="outpost-marker__detail">${logEntry.message}</span>` : ""}
     `;
     scene.appendChild(marker);
@@ -217,7 +217,7 @@ async function loadLog(): Promise<void> {
     errorBanner.hidden = true;
     reportingCount.textContent = String(latestByLocation.size);
     entryCount.textContent = String(entries.length);
-    reportingSummary.textContent = `${latestByLocation.size} of ${outposts.length} outposts reporting`;
+    reportingSummary.textContent = `${latestByLocation.size} of ${stations.length} outposts reporting`;
 
     renderMarkers(latestByLocation);
     renderEntries(entries);

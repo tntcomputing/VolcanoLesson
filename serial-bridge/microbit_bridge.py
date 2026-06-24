@@ -9,8 +9,11 @@ Behavior:
 - Keyboard command: r -> POST /ResetLog
 - Keyboard command: q -> quit
 """
-
 from __future__ import annotations
+
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "libs"))
 
 import argparse
 import json
@@ -99,8 +102,8 @@ def main() -> int:
     parser.add_argument("--baud", type=int, default=115200, help="Serial baud rate (default: 115200)")
     parser.add_argument(
         "--api-base-url",
-        default="http://127.0.0.1:7071/api",
-        help="API base URL (default: http://127.0.0.1:7071/api)",
+        default="https://volcanolesson-b6eccdg8dqe7gbhx.uksouth-01.azurewebsites.net/api",
+        help="API base URL (default: https://volcanolesson-b6eccdg8dqe7gbhx.uksouth-01.azurewebsites.net/api)",
     )
     parser.add_argument(
         "--serial-timeout",
@@ -116,9 +119,14 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    api_base_url = args.api_base_url.strip()
+    if api_base_url.startswith("http://") and "azurewebsites.net" in api_base_url:
+        # Azure Functions typically enforces HTTPS; avoid POST redirect behavior that can break requests.
+        api_base_url = "https://" + api_base_url[len("http://"):]
+
     print("Starting micro:bit serial bridge")
     print(f"Port: {args.port}, baud: {args.baud}")
-    print(f"API:  {args.api_base_url}")
+    print(f"API:  {api_base_url}")
     print_help()
 
     try:
@@ -138,7 +146,7 @@ def main() -> int:
                 print_help()
             if key == "r":
                 try:
-                    reset_log(args.api_base_url, args.http_timeout)
+                    reset_log(api_base_url, args.http_timeout)
                 except Exception as exc:
                     print(f"[ERR] Reset request failed: {exc}")
 
@@ -157,7 +165,7 @@ def main() -> int:
                     continue
 
                 try:
-                    post_log(args.api_base_url, parsed, args.http_timeout)
+                    post_log(api_base_url, parsed, args.http_timeout)
                 except Exception as exc:
                     print(f"[ERR] Log request failed: {exc}")
             except KeyboardInterrupt:

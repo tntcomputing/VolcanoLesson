@@ -1,2 +1,3 @@
+# Local bridge dependencies for the micro:bit serial script.
 pyserial>=3.5
 requests>=2.32.0
