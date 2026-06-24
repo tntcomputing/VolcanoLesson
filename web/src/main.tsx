@@ -24,7 +24,8 @@ const stations: Station[] = [
   { id: "B", locationId: "B", name: "East Crater", position: { left: "77%", top: "30%" } },
   { id: "C", locationId: "C", name: "South Camp", position: { left: "54%", top: "79%" } },
   { id: "D", locationId: "D", name: "West Peak", position: { left: "10%", top: "62%" } },
-  { id: "E", locationId: "E", name: "Sky Radar", position: { left: "50%", top: "12%" } }
+  { id: "E", locationId: "E", name: "Sky Radar", position: { left: "50%", top: "12%" } },
+  { id: "F", locationId: "F", name: "Enid Camp", position: { left: "30%", top: "35%" } }
 ];
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ?? "/api";

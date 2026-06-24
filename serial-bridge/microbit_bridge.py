@@ -24,6 +24,7 @@ from typing import Optional
 
 import requests
 import serial
+from serial.tools import list_ports
 
 if sys.platform == "win32":
     import msvcrt
@@ -36,6 +37,14 @@ class ParsedMessage:
     sender: str
     receiver: str
     message: str
+
+
+@dataclass
+class PortCandidate:
+    device: str
+    description: str
+    manufacturer: str
+    hwid: str
 
 
 def parse_line(line: str) -> Optional[ParsedMessage]:
@@ -96,9 +105,94 @@ def get_keypress() -> Optional[str]:
     return key.lower()
 
 
+def looks_like_message(line: str) -> bool:
+    return parse_line(line) is not None
+
+
+def list_candidate_ports() -> list[PortCandidate]:
+    candidates: list[PortCandidate] = []
+
+    for port in list_ports.comports():
+        description = port.description or ""
+        manufacturer = port.manufacturer or ""
+        hwid = port.hwid or ""
+        haystack = " ".join([description, manufacturer, hwid]).lower()
+
+        if "bluetooth" in haystack:
+            continue
+
+        candidates.append(
+            PortCandidate(
+                device=port.device,
+                description=description,
+                manufacturer=manufacturer,
+                hwid=hwid,
+            )
+        )
+
+    return candidates
+
+
+def probe_port(device: str, baud: int, timeout: float, attempts: int = 6) -> bool:
+    try:
+        with serial.Serial(device, baud, timeout=timeout) as ser:
+            ser.reset_input_buffer()
+            for _ in range(attempts):
+                raw = ser.readline()
+                if not raw:
+                    continue
+
+                line = raw.decode("utf-8", errors="replace").strip()
+                if line and looks_like_message(line):
+                    return True
+    except Exception:
+        return False
+
+    return False
+
+
+def choose_port(candidates: list[PortCandidate], baud: int, timeout: float) -> Optional[str]:
+    if not candidates:
+        return None
+
+    if len(candidates) == 1:
+        return candidates[0].device
+
+    likely_devices = [
+        candidate.device
+        for candidate in candidates
+        if probe_port(candidate.device, baud, timeout)
+    ]
+
+    if len(likely_devices) == 1:
+        return likely_devices[0]
+
+    print("Available serial ports:")
+    for index, candidate in enumerate(candidates, start=1):
+        details = " - ".join(filter(None, [candidate.description, candidate.manufacturer]))
+        if details:
+            print(f"  {index}. {candidate.device} ({details})")
+        else:
+            print(f"  {index}. {candidate.device}")
+
+    try:
+        choice = input("Select port number: ").strip()
+    except EOFError:
+        return None
+
+    if not choice.isdigit():
+        return None
+
+    selected_index = int(choice) - 1
+    if selected_index < 0 or selected_index >= len(candidates):
+        return None
+
+    return candidates[selected_index].device
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Bridge micro:bit serial messages to Volcano API")
-    parser.add_argument("--port", required=True, help="Serial port, e.g. COM5")
+    parser.add_argument("--port", help="Serial port, e.g. COM5. If omitted, the script will try to detect it.")
     parser.add_argument("--baud", type=int, default=115200, help="Serial baud rate (default: 115200)")
     parser.add_argument(
         "--api-base-url",
@@ -124,15 +218,27 @@ def main() -> int:
         # Azure Functions typically enforces HTTPS; avoid POST redirect behavior that can break requests.
         api_base_url = "https://" + api_base_url[len("http://"):]
 
+    port = args.port
+    if not port:
+        candidates = list_candidate_ports()
+        port = choose_port(candidates, args.baud, args.serial_timeout)
+        if not port:
+            print("[ERR] Unable to detect a serial port automatically.")
+            if candidates:
+                print("Use --port COMx to choose one explicitly.")
+            else:
+                print("No serial ports were found.")
+            return 1
+
     print("Starting micro:bit serial bridge")
-    print(f"Port: {args.port}, baud: {args.baud}")
+    print(f"Port: {port}, baud: {args.baud}")
     print(f"API:  {api_base_url}")
     print_help()
 
     try:
-        ser = serial.Serial(args.port, args.baud, timeout=args.serial_timeout)
+        ser = serial.Serial(port, args.baud, timeout=args.serial_timeout)
     except Exception as exc:
-        print(f"[ERR] Unable to open serial port {args.port}: {exc}")
+        print(f"[ERR] Unable to open serial port {port}: {exc}")
         return 1
 
     with ser:
