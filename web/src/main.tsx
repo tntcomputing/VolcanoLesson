@@ -20,12 +20,21 @@ type LogResponse = {
 };
 
 const stations: Station[] = [
-  { id: "A", locationId: "A", name: "North Ridge", position: { left: "20%", top: "20%" } },
-  { id: "B", locationId: "B", name: "East Crater", position: { left: "77%", top: "30%" } },
+  { id: "A", locationId: "A", name: "Ash Camp", position: { left: "20%", top: "20%" } },
+  { id: "B", locationId: "B", name: "Lava Post", position: { left: "77%", top: "30%" } },
   { id: "C", locationId: "C", name: "South Camp", position: { left: "54%", top: "79%" } },
   { id: "D", locationId: "D", name: "West Peak", position: { left: "10%", top: "62%" } },
   { id: "E", locationId: "E", name: "Sky Radar", position: { left: "50%", top: "12%" } },
-  { id: "F", locationId: "F", name: "Enid Camp", position: { left: "30%", top: "35%" } }
+  { id: "F", locationId: "F", name: "Enid Camp", position: { left: "30%", top: "35%" } },
+  { id: "G", locationId: "G", name: "Magma Hut", position: { left: "70%", top: "43%" } },
+  { id: "H", locationId: "H", name: "Cinder Pt", position: { left: "20%", top: "45%" } },
+  { id: "I", locationId: "I", name: "Glow Camp", position: { left: "47%", top: "35%" } },
+  { id: "J", locationId: "J", name: "Peak Out", position: { left: "10%", top: "35%" } },
+  { id: "K", locationId: "K", name: "Rock Den", position: { left: "20%", top: "35%" } },
+  { id: "L", locationId: "L", name: "Fire Hut", position: { left: "30%", top: "35%" } },
+  { id: "M", locationId: "M", name: "Steam Pt", position: { left: "40%", top: "35%" } },
+  { id: "N", locationId: "N", name: "Basalt 1", position: { left: "50%", top: "35%" } },
+  { id: "O", locationId: "O", name: "Crater 2", position: { left: "60%", top: "35%" } }
 ];
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ?? "/api";
