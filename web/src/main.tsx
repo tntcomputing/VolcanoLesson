@@ -27,13 +27,13 @@ const stations: Station[] = [
   { id: "E", locationId: "E", name: "Sky Radar", position: { left: "50%", top: "12%" } },
   { id: "F", locationId: "F", name: "Enid Camp", position: { left: "30%", top: "35%" } },
   { id: "G", locationId: "G", name: "Magma Hut", position: { left: "70%", top: "43%" } },
-  { id: "H", locationId: "H", name: "Cinder Pt", position: { left: "20%", top: "45%" } },
+  { id: "H", locationId: "H", name: "Cinder Pt", position: { left: "30%", top: "75%" } },
   { id: "I", locationId: "I", name: "Glow Camp", position: { left: "47%", top: "35%" } },
   { id: "J", locationId: "J", name: "Peak Out", position: { left: "10%", top: "35%" } },
-  { id: "K", locationId: "K", name: "Rock Den", position: { left: "20%", top: "35%" } },
+  { id: "K", locationId: "K", name: "Rock Den", position: { left: "12%", top: "80%" } },
   { id: "L", locationId: "L", name: "Fire Hut", position: { left: "30%", top: "35%" } },
   { id: "M", locationId: "M", name: "Steam Pt", position: { left: "40%", top: "35%" } },
-  { id: "N", locationId: "N", name: "Basalt 1", position: { left: "50%", top: "35%" } },
+  { id: "N", locationId: "N", name: "Basalt 1", position: { left: "80%", top: "80%" } },
   { id: "O", locationId: "O", name: "Crater 2", position: { left: "60%", top: "35%" } }
 ];
 
